@@ -7,15 +7,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.canonal.viewpager.adapter.WhatsappPagerAdapter
 import com.canonal.viewpager.fragment.CallListFragment
 import com.canonal.viewpager.fragment.CameraFragment
 import com.canonal.viewpager.fragment.ChatListFragment
 import com.canonal.viewpager.fragment.StatusFragment
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var viewPager: ViewPager
+    private lateinit var viewPager: ViewPager2
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -41,16 +43,46 @@ class MainActivity : AppCompatActivity() {
         viewPager = findViewById(R.id.viewPager)
         val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
 
-        val adapter = WhatsappPagerAdapter(fragmentList, fragmentTitleList, supportFragmentManager)
+        val adapter = WhatsappPagerAdapter(fragmentList, this)
         viewPager.adapter = adapter
 
-        tabLayout.setupWithViewPager(viewPager)
+       // tabLayout.setupWithViewPager(viewPager) for viewPager
+        TabLayoutMediator(tabLayout,viewPager){tab, position ->
+            //if needed setOnClick here
+            //tab.view.setOnClickListener{}
+           if(position==0){
+               tab.icon = ContextCompat.getDrawable(this, R.drawable.ic_camera)
+           }else{
+               tab.text= fragmentTitleList[position]
+           }
+        }.attach()
+
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+            //Here we have same 3 functions onPageScrolled,onPageSelected,onPageScrollStateChange
+            //override what you need, no need to override all of them
+
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+            }
+
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+            }
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+            }
+        })
 
         //Main imp of viewPager till here
         //------------------
         //Here some additional details
 
-        val tabLayoutCamera = tabLayout.getTabAt(0)
+       /* val tabLayoutCamera = tabLayout.getTabAt(0)
         tabLayoutCamera?.icon = ContextCompat.getDrawable(this, R.drawable.ic_camera)
         //To understand whether the user clicked to a particular tab rather than swiped to
         //tab, we can access view and setOnClickListener. Here, we can define a flag and use
@@ -67,9 +99,9 @@ class MainActivity : AppCompatActivity() {
         tabLayoutStatus?.text = "STATUS"
 
         val tabLayoutCalls = tabLayout.getTabAt(3)
-        tabLayoutCalls?.text = "CALLS"
+        tabLayoutCalls?.text = "CALLS"*/
 
-        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+       /* viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(
                 //on swipe executed: 2 / on select via tab: 3
                 position: Int,
@@ -90,7 +122,9 @@ class MainActivity : AppCompatActivity() {
                 //on swipe executed: 1 / on select via tab: 1
                 "onPageScrollStateChanged" showLog "state = $state"
             }
-        })
+        })*/
+
+
         //to add animation to swipe events
         // viewPager.setPageTransformer()
 
